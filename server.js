@@ -26,7 +26,7 @@ const drinkSchema = new mongoose.Schema({
         Wine: { type: Number, default: 0 },
         Spirit: { type: Number, default: 0 },
     },
-    crashouts: { type: Number, default: 0 },
+    //crashouts: { type: Number, default: 0 },
 
 });
 const Drink = mongoose.model('Drink', drinkSchema, 'daily_drinks');
