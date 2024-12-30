@@ -1,0 +1,226 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Detailed Drink Statistics</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" />
+    </noscript>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <div class="inner">
+                <a href="index.html" class="logo">
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK
+                        TRACKER</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Menu -->
+        <nav id="menu">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="statistics.html">Stats For Nerds</a></li>
+                <li><a href="elements.html">Elements</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+                <header>
+                    <h1>Drink Statistics</h1>
+                    <p>Comprehensive stats for alcohol consumption.</p>
+                </header>
+
+                <!-- Bar Chart: Total Drinks Per Day -->
+                <h2>Total Drinks Per Day (Everyone)</h2>
+                <canvas id="totalDrinksChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+
+                <!-- Bar Chart: Total Drinks Per Day (Per Person) -->
+                <h2>Total Drinks Per Day (Per Person)</h2>
+                <select id="daySelectorPerPerson" onchange="updateDrinksPerPersonChart()"></select>
+                <canvas id="drinksPerPersonChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+
+                <!-- Pie Chart: Drink Types for a Day -->
+                <h2>Drink Types Breakdown (Select Day)</h2>
+                <select id="daySelector" onchange="updatePieChart()"></select>
+                <canvas id="drinkTypePieChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="inner">
+                <section>
+                    <h2>Stay Responsible</h2>
+                    <p>Track your group's consumption responsibly and enjoy your time!</p>
+                </section>
+                <ul class="copyright">
+                    <li>&copy; LynchMob Tracker</li>
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const apiBaseUrl = 'http://localhost:3000'; // Update if needed
+        let data = []; // Data fetched from the backend
+        let drinksPerPersonChart; // Bar chart instance for "Total Drinks Per Day (Per Person)"
+        let pieChart; // Pie chart instance for "Drink Types Breakdown"
+        let totalDrinksChart; // Bar chart instance for "Total Drinks Per Day (Everyone)"
+
+        // Fetch data from backend
+        async function fetchData() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/get-data`);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                data = await response.json(); // Parse the data
+                updateDaySelectors(); // Populate the day selectors
+                updateTotalDrinksChart(); // Initialize "Total Drinks Per Day (Everyone)" chart
+                updateDrinksPerPersonChart(); // Initialize "Total Drinks Per Day (Per Person)" chart
+                updatePieChart(); // Initialize "Drink Types Breakdown" chart
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Update the day selectors
+        function updateDaySelectors() {
+            const daySelectorPerPerson = document.getElementById('daySelectorPerPerson');
+            const daySelector = document.getElementById('daySelector');
+            const uniqueDates = [...new Set(data.map(record => record.date))];
+            const options = uniqueDates.map(date => `<option value="${date}">${date}</option>`).join('');
+            daySelectorPerPerson.innerHTML = options;
+            daySelector.innerHTML = options;
+        }
+
+        // Update "Total Drinks Per Day (Everyone)" chart
+        function updateTotalDrinksChart() {
+            const totalDrinksData = {};
+
+            // Accumulate total drinks for each day
+            data.forEach(record => {
+                if (!totalDrinksData[record.date]) totalDrinksData[record.date] = 0;
+                totalDrinksData[record.date] += Object.values(record.drinks).reduce((sum, value) => sum + value, 0);
+            });
+
+            const ctxTotalDrinks = document.getElementById('totalDrinksChart').getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (totalDrinksChart) totalDrinksChart.destroy();
+
+            // Create a new bar chart
+            totalDrinksChart = new Chart(ctxTotalDrinks, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(totalDrinksData), // Dates
+                    datasets: [{
+                        label: 'Total Drinks',
+                        data: Object.values(totalDrinksData), // Total drinks per day
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Total Drinks' }, beginAtZero: true },
+                    },
+                },
+            });
+        }
+
+        // Update "Total Drinks Per Day (Per Person)" chart
+        function updateDrinksPerPersonChart() {
+            const selectedDay = document.getElementById('daySelectorPerPerson').value;
+            const dayData = data.filter(record => record.date === selectedDay);
+            const drinksPerPerson = {};
+
+            // Accumulate drinks per person for the selected day
+            dayData.forEach(record => {
+                drinksPerPerson[record.user] = Object.values(record.drinks).reduce((sum, value) => sum + value, 0);
+            });
+
+            const ctxDrinksPerPerson = document.getElementById('drinksPerPersonChart').getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (drinksPerPersonChart) drinksPerPersonChart.destroy();
+
+            // Create a new bar chart
+            drinksPerPersonChart = new Chart(ctxDrinksPerPerson, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(drinksPerPerson), // Usernames
+                    datasets: [{
+                        label: 'Total Drinks',
+                        data: Object.values(drinksPerPerson), // Total drinks per user
+                        backgroundColor: Object.keys(drinksPerPerson).map(() =>
+                            `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`
+                        ), // Random colors
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'User' } },
+                        y: { title: { display: true, text: 'Total Drinks' }, beginAtZero: true },
+                    },
+                },
+            });
+        }
+
+        // Update "Drink Types Breakdown" pie chart
+        function updatePieChart() {
+            const selectedDay = document.getElementById('daySelector').value;
+            const dayData = data.filter(record => record.date === selectedDay);
+            const drinkTypes = { Beer: 0, Wine: 0, Cocktail: 0, Other: 0 };
+
+            // Accumulate drink types for the selected day
+            dayData.forEach(record => {
+                for (const [type, amount] of Object.entries(record.drinks)) {
+                    drinkTypes[type] += amount;
+                }
+            });
+
+            const ctxDrinkTypePie = document.getElementById('drinkTypePieChart').getContext('2d');
+
+            // Destroy previous pie chart instance if exists
+            if (pieChart) pieChart.destroy();
+
+            // Create a new pie chart
+            pieChart = new Chart(ctxDrinkTypePie, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(drinkTypes),
+                    datasets: [{
+                        data: Object.values(drinkTypes),
+                        backgroundColor: ['rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 'rgba(75, 192, 192, 0.6)', 'rgba(153, 102, 255, 0.6)'],
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { position: 'top' } },
+                },
+            });
+        }
+
+        // Fetch data on page load
+        fetchData();
+    </script>
+</body>
+
+</html>

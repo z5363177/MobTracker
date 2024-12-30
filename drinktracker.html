@@ -1,0 +1,150 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>LYNCHMOB DRINK TRACKER</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <style>
+        /* Custom styles for the drink tracker */
+        .person {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .drink-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        #timer {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <div class="inner">
+                <!-- Logo -->
+                <a href="#" class="logo">
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK TRACKER</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+                <header>
+                    <h1>Welcome to LYNCHMOB Drink Tracker</h1>
+                    <p>Track your drinks for the night, the month, or the year!</p>
+                </header>
+
+                <!-- Timer -->
+                <div id="timer">Loading date and time...</div>
+
+                <!-- Drink Tracker -->
+                <section>
+                    <button id="add-person">Add Person</button>
+                    <div id="person-list">
+                        <!-- Dynamic content for people and drink counters -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="inner">
+                <p>&copy; Lynchmob Drink Tracker. Design inspired by HTML5 UP.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Timer functionality
+        function updateTimer() {
+            const now = new Date();
+            document.getElementById('timer').textContent = now.toLocaleString();
+        }
+        setInterval(updateTimer, 1000);
+
+        // Drink Tracker functionality
+        const people = [];
+
+        document.getElementById('add-person').addEventListener('click', () => {
+            const name = prompt('Enter the person\'s name:');
+            if (name) {
+                people.push({ name, drinks: [] });
+                renderPeople();
+            }
+        });
+
+        function renderPeople() {
+            const personList = document.getElementById('person-list');
+            personList.innerHTML = '';
+
+            people.forEach((person, index) => {
+                const personDiv = document.createElement('div');
+                personDiv.classList.add('person');
+
+                const drinkCount = person.drinks.reduce((total, drink) => total + drink.quantity, 0);
+
+                personDiv.innerHTML = `
+                    <h2>${person.name}</h2>
+                    <p>Total Drinks: ${drinkCount}</p>
+                    <div class="drink-form">
+                        <select id="drink-type-${index}">
+                            <option value="Beer">Beer</option>
+                            <option value="Wine">Wine</option>
+                            <option value="Cocktail">Cocktail</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="number" id="drink-quantity-${index}" placeholder="Qty" min="1" />
+                        <button onclick="addDrink(${index})">Add Drink</button>
+                    </div>
+                    <p id="success-${index}" class="success-message" style="display: none;">Drink added successfully!</p>
+                `;
+
+                personList.appendChild(personDiv);
+            });
+        }
+
+        function addDrink(index) {
+            const drinkType = document.getElementById(`drink-type-${index}`).value;
+            const drinkQuantity = parseInt(document.getElementById(`drink-quantity-${index}`).value, 10);
+
+            if (!drinkQuantity || drinkQuantity < 1) {
+                alert('Please enter a valid quantity.');
+                return;
+            }
+
+            people[index].drinks.push({ type: drinkType, quantity: drinkQuantity });
+
+            const successMessage = document.getElementById(`success-${index}`);
+            successMessage.style.display = 'block';
+            setTimeout(() => successMessage.style.display = 'none', 2000);
+
+            renderPeople();
+        }
+    </script>
+</body>
+</html>
