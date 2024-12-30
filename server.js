@@ -1,20 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import the CORS middleware
+
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
-const PORT = 3000;
-const cors = require('cors');
-app.use(cors()); // Enable CORS for all requests
+const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
+// Middleware setup
+app.use(cors()); // Enable CORS
+app.use(bodyParser.json()); // Parse incoming JSON requests
 
-// MongoDB Connection
-const mongoURI = 'mongodb+srv://jeremy:password1!@mob.ka2gc.mongodb.net/daily_drinks?retryWrites=true&w=majority&appName=Mob';
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
-    .catch((err) => console.error('MongoDB connection error:', err));
+    .catch(err => console.error('MongoDB connection error:', err));
 
 // Schema Definition
 const drinkSchema = new mongoose.Schema({
@@ -87,6 +88,6 @@ app.get('/get-data/:date', async (req, res) => {
 });
 
 // Start the Server
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
 });
