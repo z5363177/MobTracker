@@ -19,10 +19,17 @@
         <header id="header">
             <div class="inner">
                 <a href="index.html" class="logo">
-                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Drink
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Lynch Mob Drink
                         Tracker</span>
                 </a>
             </div>
+            <!-- Nav -->
+            <nav>
+                <ul>
+                    <li><a href="#menu">Menu</a></li>
+                </ul>
+            </nav>
+
         </header>
 
         <!-- Menu -->
@@ -30,10 +37,11 @@
             <h2>Menu</h2>
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="generic.html">User Stats</a></li>
-                <li><a href="elements.html">About</a></li>
+                <li><a href="statistics.html">How many beers did we hawk tuah? </a></li>
+                <li><a href="crashouts.html">Crashouts lad</a></li>
             </ul>
         </nav>
+
 
         <!-- Main -->
         <div id="main">
@@ -41,15 +49,17 @@
                 <!-- Heading and Photo -->
                 <header>
                     <h1>Welcome to Your Drink Tracker</h1>
-                    <p>Track your drinks on a night out with real-time stats.</p>
+                    <p>Dont crash out bro please</p>
                 </header>
                 <span class="image main"><img src="images/pic13.jpg" alt="Night Out" /></span>
 
                 <!-- Drink Tracker -->
                 <section>
-                    <h2>Track Your Drinks</h2>
+                    <h2>Track Your Bintangs</h2>
+                    <p> <i> no bintang no party </i> </p>
                     <p>Use the dropdown below to select the type of drink and input the quantity. Your stats will update
                         automatically!</p>
+
 
                     <!-- Real-Time Timer -->
                     <div id="timer" style="font-weight: bold; font-size: 1.2em; margin-bottom: 1em;"></div>
@@ -60,8 +70,9 @@
                         <select id="drink-type">
                             <option value="Beer">Beer</option>
                             <option value="Wine">Wine</option>
-                            <option value="Cocktail">Cocktail</option>
-                            <option value="Water">Water</option>
+                            <option value="Spirit">Spirit</option>
+                            <option value="crashouts">CRASHOUTTSSSS</option>
+
                         </select>
                         <br />
                         <label for="drink-quantity">Quantity:</label>
@@ -71,19 +82,18 @@
                     </div>
 
                     <!-- Drink Stats -->
-                    <h3>Drink Stats</h3>
-                    <p id="total-drinks">Total Drinks: 0</p>
-                    <ul id="drink-list"></ul>
                 </section>
             </div>
         </div>
 
         <!-- Footer -->
+        <span class="image main"><img src="images/cold.jpg" alt="Night Out" /></span>
+
         <footer id="footer">
             <div class="inner">
                 <section>
-                    <h2>Stay Responsible</h2>
-                    <p>Track your consumption responsibly and enjoy your time!</p>
+                    <h2>Stay Woke</h2>
+                    <p>Pussyo drink up</p>
                 </section>
                 <ul class="copyright">
                     <li>&copy; Your Tracker</li>
@@ -100,7 +110,7 @@
     <script src="assets/js/util.js"></script>
     <script src="assets/js/main.js"></script>
     <script>
-        const apiBaseUrl = 'http://localhost:3000'; // Replace with your backend URL if hosted
+        const apiBaseUrl = 'https://mobtracker.onrender.com'; // Replace with your backend URL if hosted
 
         // Real-time Timer
         function updateTimer() {
@@ -125,9 +135,9 @@
 
             const drinkData = {
                 date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
-                //----------------------------------------------------------------------//
-                user: 'Crossy', // Replace with PERSON NAME
-                //----------------------------------------------------------------------//
+                //----------------------------------------------------
+                user: 'Crossy', // Replace with dynamic user ID if needed
+                //----------------------------------------------------
 
                 drinkType: drinkType,
                 quantity: drinkQuantity,
