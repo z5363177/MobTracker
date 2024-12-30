@@ -6,7 +6,7 @@ const cors = require('cors'); // Import the CORS middleware
 require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 10000;
 
 // Middleware setup
 app.use(cors()); // Enable CORS
@@ -89,5 +89,10 @@ app.get('/get-data/:date', async (req, res) => {
 
 // Start the Server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    if (process.env.NODE_ENV === 'production') {
+        console.log(`Server running at https://mobtracker.onrender.com`);
+    } else {
+        console.log(`Server running locally at http://localhost:${port}`);
+    }
 });
+
