@@ -1,11 +1,14 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <title>LYNCHMOB DRINK TRACKER</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <link rel="stylesheet" href="assets/css/main.css" />
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" />
+    </noscript>
     <style>
         /* Custom styles for the drink tracker */
         .person {
@@ -35,6 +38,7 @@
         }
     </style>
 </head>
+
 <body class="is-preload">
     <!-- Wrapper -->
     <div id="wrapper">
@@ -44,7 +48,8 @@
             <div class="inner">
                 <!-- Logo -->
                 <a href="#" class="logo">
-                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK TRACKER</span>
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK
+                        TRACKER</span>
                 </a>
             </div>
         </header>
@@ -138,6 +143,8 @@
             }
 
             people[index].drinks.push({ type: drinkType, quantity: drinkQuantity });
+            people[index].crashouts = crashouts; // Add crashouts data
+
 
             const successMessage = document.getElementById(`success-${index}`);
             successMessage.style.display = 'block';
@@ -147,4 +154,5 @@
         }
     </script>
 </body>
+
 </html>

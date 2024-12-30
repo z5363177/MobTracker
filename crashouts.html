@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>LYNCHMOB DRINK TRACKER</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" />
+    </noscript>
+</head>
+
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <div class="inner">
+
+                <!-- Logo -->
+                <a href="index.html" class="logo">
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK
+                        TRACKER</span>
+                </a>
+
+                <!-- Nav -->
+                <nav>
+                    <ul>
+                        <li><a href="#menu">Menu</a></li>
+                    </ul>
+                </nav>
+
+            </div>
+        </header>
+
+        <!-- Menu -->
+        <nav id="menu">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="statistics.html">How many beers did we hawk tuah? </a></li>
+                <li><a href="crashouts.html">Crashouts lad</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+                <header>
+                    <h1>Crashouts Statistics</h1>
+                    <p>bro u fuckin crashed outttttt.</p>
+                </header>
+
+                <!-- Bar Chart: Total Crashouts Per Day -->
+                <h2>Total Crashouts Per Day (Everyone)</h2>
+                <canvas id="totalCrashoutsChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+
+                <!-- Bar Chart: Total Crashouts Per Day (Per Person) -->
+                <h2>Total Crashouts Per Day (Per Person)</h2>
+                <select id="daySelectorPerPerson" onchange="updateCrashoutsPerPersonChart()"></select>
+                <canvas id="crashoutsPerPersonChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="inner">
+                <section>
+                    <h2>Stay Responsible</h2>
+                    <p>Track your group's crashouts responsibly and enjoy your time!</p>
+                </section>
+                <ul class="copyright">
+                    <li>&copy; LynchMob Tracker</li>
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const apiBaseUrl = 'https://mobtracker.onrender.com'; // Update if needed
+        let data = []; // Data fetched from the backend
+        let crashoutsPerPersonChart; // Bar chart instance for "Total Crashouts Per Day (Per Person)"
+        let crashoutsPieChart; // Pie chart instance for "Crashouts Breakdown by Drink Type"
+        let totalCrashoutsChart; // Bar chart instance for "Total Crashouts Per Day (Everyone)"
+
+        // Fetch data from backend
+        async function fetchData() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/get-data`);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                data = await response.json(); // Parse the data
+                updateDaySelectors(); // Populate the day selectors
+                updateTotalCrashoutsChart(); // Initialize "Total Crashouts Per Day (Everyone)" chart
+                updateCrashoutsPerPersonChart(); // Initialize "Total Crashouts Per Day (Per Person)" chart
+                updateCrashoutsPieChart(); // Initialize "Crashouts Breakdown by Drink Type" chart
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Update the day selectors
+        function updateDaySelectors() {
+            const daySelectorPerPerson = document.getElementById('daySelectorPerPerson');
+            const daySelector = document.getElementById('daySelector');
+            const uniqueDates = [...new Set(data.map(record => record.date))];
+            const options = uniqueDates.map(date => `<option value="${date}">${date}</option>`).join('');
+            daySelectorPerPerson.innerHTML = options;
+            daySelector.innerHTML = options;
+        }
+
+        // Update "Total Crashouts Per Day (Everyone)" chart
+        function updateTotalCrashoutsChart() {
+            const totalCrashoutsData = {};
+
+            // Accumulate total crashouts for each day
+            data.forEach(record => {
+                if (!totalCrashoutsData[record.date]) totalCrashoutsData[record.date] = 0;
+                totalCrashoutsData[record.date] += record.crashouts || 0; // Ensure crashouts exists
+            });
+
+            const ctxTotalCrashouts = document.getElementById('totalCrashoutsChart').getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (totalCrashoutsChart) totalCrashoutsChart.destroy();
+
+            // Create a new bar chart
+            totalCrashoutsChart = new Chart(ctxTotalCrashouts, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(totalCrashoutsData), // Dates
+                    datasets: [{
+                        label: 'Total Crashouts',
+                        data: Object.values(totalCrashoutsData), // Total crashouts per day
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Date' } },
+                        y: { title: { display: true, text: 'Total Crashouts' }, beginAtZero: true },
+                    },
+                },
+            });
+        }
+
+        // Update "Total Crashouts Per Day (Per Person)" chart
+        function updateCrashoutsPerPersonChart() {
+            const selectedDay = document.getElementById('daySelectorPerPerson').value;
+            const dayData = data.filter(record => record.date === selectedDay);
+            const crashoutsPerPerson = {};
+
+            // Accumulate crashouts per person for the selected day
+            dayData.forEach(record => {
+                crashoutsPerPerson[record.user] = record.crashouts || 0;
+            });
+
+            const ctxCrashoutsPerPerson = document.getElementById('crashoutsPerPersonChart').getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (crashoutsPerPersonChart) crashoutsPerPersonChart.destroy();
+
+            // Create a new bar chart
+            crashoutsPerPersonChart = new Chart(ctxCrashoutsPerPerson, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(crashoutsPerPerson), // Usernames
+                    datasets: [{
+                        label: 'Crashouts',
+                        data: Object.values(crashoutsPerPerson), // Crashouts per user
+                        backgroundColor: Object.keys(crashoutsPerPerson).map(() =>
+                            `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.6)`),
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'User' } },
+                        y: { title: { display: true, text: 'Crashouts' }, beginAtZero: true },
+                    },
+                },
+            });
+        }
+
+        // Fetch data on page load
+        fetchData();
+    </script>
+</body>
+
+</html>

@@ -187,7 +187,7 @@
         function updatePieChart() {
             const selectedDay = document.getElementById('daySelector').value;
             const dayData = data.filter(record => record.date === selectedDay);
-            const drinkTypes = { Beer: 0, Wine: 0, Cocktail: 0, Other: 0 };
+            const drinkTypes = { Beer: 0, Wine: 0, Spirit: 0, Other: 0 };
 
             // Accumulate drink types for the selected day
             dayData.forEach(record => {

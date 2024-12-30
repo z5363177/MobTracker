@@ -24,9 +24,10 @@ const drinkSchema = new mongoose.Schema({
     drinks: {
         Beer: { type: Number, default: 0 },
         Wine: { type: Number, default: 0 },
-        Cocktail: { type: Number, default: 0 },
-        Other: { type: Number, default: 0 },
+        Spirit: { type: Number, default: 0 },
     },
+    crashouts: { type: Number, default: 0 },
+
 });
 const Drink = mongoose.model('Drink', drinkSchema, 'daily_drinks');
 
@@ -35,9 +36,9 @@ const Drink = mongoose.model('Drink', drinkSchema, 'daily_drinks');
 
 // Add or Update Drink Data
 app.post('/add-data', async (req, res) => {
-    const { date, user, drinkType, quantity } = req.body;
+    const { date, user, drinkType, quantity, crashouts } = req.body;
 
-    if (!date || !user || !drinkType || !quantity) {
+    if (!date || !user || !drinkType || quantity == null) {
         return res.status(400).json({ message: 'Invalid data format' });
     }
 
@@ -48,8 +49,11 @@ app.post('/add-data', async (req, res) => {
             record = new Drink({ date, user });
         }
 
-        // Increment drink count
+        // Update drinks and crashouts
         record.drinks[drinkType] = (record.drinks[drinkType] || 0) + quantity;
+        if (crashouts != null) {
+            record.crashouts = crashouts; // Update or set crashouts
+        }
 
         await record.save();
         res.json({ message: 'Data added successfully', record });
