@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Drink Tracker - User</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript>
+        <link rel="stylesheet" href="assets/css/noscript.css" />
+    </noscript>
+</head>
+
+<body class="is-preload">
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <div class="inner">
+                <a href="index.html" class="logo">
+                    <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">Lynch Mob Drink
+                        Tracker</span>
+                </a>
+            </div>
+            <!-- Nav -->
+            <nav>
+                <ul>
+                    <li><a href="#menu">Menu</a></li>
+                </ul>
+            </nav>
+
+        </header>
+
+        <!-- Menu -->
+        <nav id="menu">
+            <h2>Menu</h2>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="statistics.html">How many beers did we hawk tuah? </a></li>
+                <li><a href="crashouts.html">Crashouts lad</a></li>
+            </ul>
+        </nav>
+
+
+        <!-- Main -->
+        <div id="main">
+            <div class="inner">
+                <!-- Heading and Photo -->
+                <header>
+                    <h1>Welcome to Daevans(Aidans) Drink Tracker</h1>
+                    <p>Dont crash out bro please</p>
+                </header>
+                <span class="image main"><img src="images/pic13.jpg" alt="Night Out" /></span>
+
+                <!-- Drink Tracker -->
+                <section>
+                    <h2>Track Your Bintangs</h2>
+                    <p> <i> no bintang no party </i> </p>
+                    <p>Use the dropdown below to select the type of drink and input the quantity. Your stats will update
+                        automatically!</p>
+
+
+                    <!-- Real-Time Timer -->
+                    <div id="timer" style="font-weight: bold; font-size: 1.2em; margin-bottom: 1em;"></div>
+
+                    <!-- Drink Tracker Form -->
+                    <div>
+                        <label for="drink-type">Drink Type:</label>
+                        <select id="drink-type">
+                            <option value="Beer">Beer</option>
+                            <option value="Wine">Wine</option>
+                            <option value="Spirit">Spirit</option>
+                            <option value="crashouts">CRASHOUTTSSSS</option>
+
+                        </select>
+                        <br />
+                        <label for="drink-quantity">Quantity:</label>
+                        <input type="number" id="drink-quantity" placeholder="Enter quantity" min="1" />
+                        <br />
+                        <button onclick="addDrink()">Add Drink</button>
+                    </div>
+
+                    <!-- Drink Stats -->
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <span class="image main"><img src="images/cold.jpg" alt="Night Out" /></span>
+
+        <footer id="footer">
+            <div class="inner">
+                <section>
+                    <h2>Stay Woke</h2>
+                    <p>Pussyo drink up</p>
+                </section>
+                <ul class="copyright">
+                    <li>&copy; Your Tracker</li>
+                    <li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+                </ul>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        const apiBaseUrl = 'https://mobtracker.onrender.com'; // Replace with your backend URL if hosted
+
+        // Real-time Timer
+        function updateTimer() {
+            const now = new Date();
+            document.getElementById('timer').textContent =
+                `Current Time: ${now.toDateString()} ${now.toLocaleTimeString()}`;
+        }
+        setInterval(updateTimer, 1000);
+
+        // Drink Tracker Logic
+        let totalDrinks = 0;
+        const drinkStats = {};
+
+        async function addDrink() {
+            const drinkType = document.getElementById('drink-type').value;
+            const drinkQuantity = parseFloat(document.getElementById('drink-quantity').value);
+
+            if (isNaN(drinkQuantity) || drinkQuantity <= 0) {
+                alert('Please enter a valid quantity!');
+                return;
+            }
+
+            const drinkData = {
+                date: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
+                //----------------------------------------------------
+                user: 'Aidan', // Replace with dynamic user ID if needed
+                //----------------------------------------------------
+
+                drinkType: drinkType,
+                quantity: drinkQuantity,
+            };
+
+            try {
+                // Send data to the backend
+                const response = await fetch(`${apiBaseUrl}/add-data`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(drinkData),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save drink data!');
+                }
+
+                alert('Drink added successfully!');
+                fetchDrinkStats(); // Refresh stats
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error adding drink. Please try again.');
+            }
+        }
+
+        async function fetchDrinkStats() {
+            const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+
+            try {
+                // Fetch data from the backend
+                const response = await fetch(`${apiBaseUrl}/get-data/${today}`);
+                const data = await response.json();
+
+                // Reset stats and update UI
+                totalDrinks = 0;
+                Object.keys(drinkStats).forEach(key => delete drinkStats[key]);
+
+                data.forEach(record => {
+                    totalDrinks += record.quantity;
+                    if (!drinkStats[record.drinkType]) {
+                        drinkStats[record.drinkType] = 0;
+                    }
+                    drinkStats[record.drinkType] += record.quantity;
+                });
+
+                // Update UI
+                document.getElementById('total-drinks').textContent = `Total Drinks: ${totalDrinks}`;
+                const drinkList = document.getElementById('drink-list');
+                drinkList.innerHTML = '';
+                for (const [type, quantity] of Object.entries(drinkStats)) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${type}: ${quantity}`;
+                    drinkList.appendChild(listItem);
+                }
+            } catch (error) {
+                console.error('Error fetching drink stats:', error);
+                //alert('Error loading stats. Please try again.');
+            }
+        }
+
+        // Fetch stats on page load
+        document.addEventListener('DOMContentLoaded', fetchDrinkStats);
+    </script>
+</body>
+
+</html>
