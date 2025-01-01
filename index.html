@@ -58,10 +58,14 @@
 						designed by Jez</a>.</h1>
 					<p>The aim of this website is to easily track drinks on a night out and to see how fucked we are.
 					</p>
-					<p>Click your name and put ur drink in. Only beers, spirits, wines and waters <sub> pussy </sub>
+					<p>Click your name and put ur drink in. Only beers, spirits, wines for now <sub> pussy </sub>
 					</p>
 
-					<p>Furthermore, crashouts can be recorded on this website.</p>
+					<p>Furthermore, crashouts can be recorded on this website<sub> Not working rn idk y im actually
+							gonna crashout </sub></p>
+					<h3>Fun Facts!</h3>
+					<blockquote id="randomFact" class="fact-text">Loading fun fact...</blockquote>
+
 
 				</header>
 				<section class="tiles">
@@ -311,6 +315,96 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+
+	<script>
+		const alcoholFunFacts = [
+			"The word 'alcohol' comes from the Arabic word 'al-kuḥl,' meaning 'the pureness' or 'distilled essence.'",
+			"Ancient Egyptians brewed beer so well that archaeologists found a 3,000-year-old brewery still intact.",
+			"The longest hangover in history lasted a full 15 days. Talk about overdoing it!",
+			"The world's most expensive beer, BrewDog's 'The End of History,' costs $765 per bottle.",
+			"In the 18th century, it was common to drink beer for breakfast in England.",
+			"The first ever cocktail, the 'Sazerac,' was made in New Orleans in the 1800s.",
+			"A single glass of wine can contain up to 100 different types of chemicals.",
+			"Ancient Romans believed wine was a gift from the gods, often offering it to their deities in sacred rituals.",
+			"Whiskey is made from fermented grain, but it wasn’t until the 15th century that it was distilled in Europe.",
+			"The world’s first distilled spirit, called 'Aqua Vitae,' was invented in the 12th century by monks.",
+			"The U.S. government once banned the sale of absinthe because it was believed to drive people mad.",
+			"Champagne is often referred to as 'the drink of the gods' because it was believed to be fit only for the elite.",
+			"In the 1600s, English gin was so popular that the term 'Mother’s Ruin' was coined for it.",
+			"A popular medieval drink was 'hippocras,' a sweetened spiced wine.",
+			"In 2009, scientists discovered that drinking moderate amounts of red wine can help prevent tooth decay.",
+			"Beer is one of the oldest alcoholic beverages in the world, dating back to around 5,000 BC.",
+			"The largest ever whiskey barrel was built in 2010 and can hold up to 600,000 liters.",
+			"One glass of vodka has roughly the same amount of calories as a slice of pizza.",
+			"Tequila is made from the blue agave plant, but did you know it’s technically a distilled spirit, not a liqueur?",
+			"The term 'cocktail' originally referred to a mixed drink that included alcohol, sugar, water, and bitters.",
+			"A shot of whiskey is also known as 'a nip' in some parts of the world.",
+			"Drinking alcohol in moderation can increase the 'good' cholesterol (HDL) in your blood.",
+			"The world’s first cocktail recipe, the 'Sazerac,' was originally created with absinthe.",
+			"Before vodka was mass-produced, it was made in small batches at home in Russia.",
+			"It’s illegal to drink alcohol while riding a camel in the United Arab Emirates.",
+			"In some places, you can legally drink alcohol at 18, but only if you're married!",
+			"Prohibition in the U.S. didn’t stop people from drinking—it just made them get more creative with hidden speakeasies.",
+			"The world’s largest wine cellar is in Moldova, with an underground network stretching over 200 kilometers.",
+			"A 'beer belly' isn't actually caused by beer, but by the excess calories in alcohol.",
+			"The oldest known wine cellar was found in Armenia, dating back over 6,000 years.",
+			"There's a town in France where it's illegal to drink wine without eating bread.",
+			"The first modern margarita was created in 1938 in Texas, but no one knows who invented it.",
+			"A 'Scotch' is only considered Scotch if it's made in Scotland, according to strict regulations.",
+			"The longest whiskey tasting session lasted 35 hours.",
+			"The phrase 'going to the bar' originated from medieval times when people would gather around wooden bars to drink.",
+			"One of the earliest beer advertisements in the U.S. featured a dog drinking a can of beer.",
+			"A pint of Guinness is said to be good for your health, as it contains iron.",
+			"The 'beer goggles' effect is a real thing, caused by alcohol impairing your judgment and vision.",
+			"The tradition of toasting began in ancient Greece to ensure no one was poisoning the wine.",
+			"Drinking alcohol before bed can actually disrupt your sleep patterns, despite making you feel sleepy.",
+			"The record for most beers drunk in a single sitting is 156 beers!",
+			"In the 1800s, sailors drank a daily ration of rum to protect against scurvy.",
+			"In medieval Europe, drinking beer was considered healthier than drinking water.",
+			"'Zima' was a clear malt beverage popular in the '90s—people either loved it or hated it.",
+			"Some people believe that the myth of 'beer before liquor, never sicker' is based on the acidity of drinks.",
+			"In ancient China, tea and wine were often consumed together, with a practice called 'tea-wine drinking.'",
+			"The world record for the largest wine glass holds 42,000 liters of wine.",
+			"Bourbon whiskey is only called that if it’s made in the U.S. and contains at least 51% corn.",
+			"The word 'brandy' comes from the Dutch word 'brandewijn,' meaning 'burnt wine.'",
+			"Moonshine was once considered the original 'craft beer' of the Prohibition era.",
+			"A 'rum runner' was someone who smuggled alcohol into the U.S. during Prohibition.",
+			"The original Margarita recipe had no lime juice; it was made with lemon juice instead.",
+			"The longest beer pong game lasted 35 hours, 20 minutes!",
+			"In some cultures, rice wine is used in religious rituals and ceremonies.",
+			"The world’s largest gin and tonic was served in a swimming pool and measured over 6 meters tall!",
+			"'Irish coffee' was created in 1943 in an Irish airport to warm up cold travelers.",
+			"In ancient India, they had a sweet, alcoholic beverage called 'Sura,' made from fermented barley.",
+			"Modern-day beer contains around 90% water.",
+			"The first bottle of champagne had a cork made from wood, and it often popped out uncontrollably.",
+			"The phrase 'wine o'clock' was coined as a humorous way of saying it’s time for a glass of wine.",
+			"In Japan, it's considered rude to pour your own drink; it's customary for others to pour for you.",
+			"The phrase 'proof' originated in the 16th century, when sailors would test rum by mixing it with gunpowder and setting it on fire.",
+			"Drinking wine from a glass with a thin stem, called a 'flute,' makes it taste better due to the design.",
+			"Rum was once used to pay sailors in the British Navy.",
+			"Some believe drinking alcohol before a meal can stimulate the appetite—just don’t overdo it!",
+			"The longest tequila shot took 1 minute and 10 seconds to finish, with 50 liters of tequila consumed.",
+			"Drinking beer can actually make you feel more relaxed, but that’s mainly the result of the alcohol content.",
+			"Wine was often mixed with water in ancient Rome—because it was considered impolite to drink it straight.",
+			"Tequila can help alleviate sunburns when applied topically (but don't drink it to fix a burn!).",
+			"'Pimm’s Cup' is a cocktail that started as a medicinal drink to aid digestion.",
+			"In the 19th century, 'mixed drinks' were a revolutionary idea, and bartenders got much more creative.",
+			"The oldest known alcohol still in existence is a bottle of 1780’s Madeira wine.",
+			"Ancient Greeks considered wine an essential part of any philosophical debate.",
+			"In Scandinavia, the tradition of 'Aquavit' dates back over 500 years and involves a spirit flavored with herbs and spices.",
+			"The largest number of different beers tasted by one person in a lifetime is over 10,000!",
+			"'Cider' was originally made from fermented apple juice but often included other fruits like pears or berries.",
+			"Alcohol was sometimes considered a form of currency in ancient times, often used for bartering.",
+			"Oscars an alcoholic"
+		];
+
+		function displayRandomFact() {
+			const randomIndex = Math.floor(Math.random() * alcoholFunFacts.length);
+			document.getElementById('randomFact').innerText = alcoholFunFacts[randomIndex];
+		}
+
+		window.onload = displayRandomFact;
+	</script>
 
 </body>
 
