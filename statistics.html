@@ -19,10 +19,20 @@
         <!-- Header -->
         <header id="header">
             <div class="inner">
+
+                <!-- Logo -->
                 <a href="index.html" class="logo">
                     <span class="symbol"><img src="images/logo.svg" alt="" /></span><span class="title">LYNCHMOB DRINK
                         TRACKER</span>
                 </a>
+
+                <!-- Nav -->
+                <nav>
+                    <ul>
+                        <li><a href="#menu">Menu</a></li>
+                    </ul>
+                </nav>
+
             </div>
         </header>
 
@@ -32,7 +42,7 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="statistics.html">Stats For Nerds</a></li>
-                <li><a href="elements.html">Elements</a></li>
+                <li><a href="crashouts.html">Crashouts lad</a></li>
             </ul>
         </nav>
 
@@ -43,6 +53,9 @@
                     <h1>Drink leaderboard</h1>
                     <p>lads its not a competition</p>
                 </header>
+                <h2>Total Drinks Per Year</h2>
+                <canvas id="drinksPerYearChart" style="max-width: 800px; margin: 0 auto;"></canvas>
+
 
                 <!-- Bar Chart: Total Drinks Per Day -->
                 <h2>Total Drinks Per Day (Everyone)</h2>
@@ -82,6 +95,7 @@
         let drinksPerPersonChart; // Bar chart instance for "Total Drinks Per Day (Per Person)"
         let pieChart; // Pie chart instance for "Drink Types Breakdown"
         let totalDrinksChart; // Bar chart instance for "Total Drinks Per Day (Everyone)"
+        let drinksPerYearChart; // Chart instances
 
         // Fetch data from backend
         async function fetchData() {
@@ -93,6 +107,8 @@
                 updateTotalDrinksChart(); // Initialize "Total Drinks Per Day (Everyone)" chart
                 updateDrinksPerPersonChart(); // Initialize "Total Drinks Per Day (Per Person)" chart
                 updatePieChart(); // Initialize "Drink Types Breakdown" chart
+                updateDrinksPerYearChart(); // Initialize "Drinks Per Year" chart
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -102,7 +118,8 @@
         function updateDaySelectors() {
             const daySelectorPerPerson = document.getElementById('daySelectorPerPerson');
             const daySelector = document.getElementById('daySelector');
-            const uniqueDates = [...new Set(data.map(record => record.date))];
+            const uniqueDates = [...new Set(data.map(record => record.date))]
+                .sort((a, b) => new Date(b) - new Date(a)); // Sort in descending order by date
             const options = uniqueDates.map(date => `<option value="${date}">${date}</option>`).join('');
             daySelectorPerPerson.innerHTML = options;
             daySelector.innerHTML = options;
@@ -217,6 +234,42 @@
                 },
             });
         }
+        function updateDrinksPerYearChart() {
+            const drinksPerYearData = {};
+
+            // Accumulate total drinks per year
+            data.forEach(record => {
+                const year = record.date.split('-')[0]; // Extract the year (YYYY)
+                if (!drinksPerYearData[year]) drinksPerYearData[year] = 0;
+                drinksPerYearData[year] += Object.values(record.drinks).reduce((sum, value) => sum + value, 0);
+            });
+
+            const ctxDrinksPerYear = document.getElementById('drinksPerYearChart').getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (drinksPerYearChart) drinksPerYearChart.destroy();
+
+            // Create a new bar chart
+            drinksPerYearChart = new Chart(ctxDrinksPerYear, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(drinksPerYearData), // Years
+                    datasets: [{
+                        label: 'Total Drinks Per Year',
+                        data: Object.values(drinksPerYearData), // Total drinks per year
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Year' } },
+                        y: { title: { display: true, text: 'Total Drinks' }, beginAtZero: true },
+                    },
+                },
+            });
+        }
+
 
         // Fetch data on page load
         fetchData();
