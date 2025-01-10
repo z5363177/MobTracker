@@ -10,6 +10,42 @@
         <link rel="stylesheet" href="assets/css/noscript.css" />
     </noscript>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Fire animation styles */
+        #fire-animation {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 165, 0, 0.8) 25%, rgba(255, 69, 0, 0.6) 50%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            /* Place behind the number */
+            animation: flicker 1s infinite ease-in-out alternate;
+            pointer-events: none;
+            /* Prevent interactions */
+        }
+
+        /* Flickering animation */
+        @keyframes flicker {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+    </style>
 </head>
 
 <body class="is-preload">
@@ -42,7 +78,7 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="statistics.html">Stats For Nerds</a></li>
-                <li><a href="crashouts.html">Crashouts lad</a></li>
+                <li><a href="crashouts.html">Crashouts</a></li>
             </ul>
         </nav>
 
@@ -53,9 +89,17 @@
                     <h1>Drink leaderboard</h1>
                     <p>lads its not a competition</p>
                 </header>
+
+                <!-- Fire Animation Container -->
+                <div id="yearly-total-container" style="position: relative; text-align: center; margin: 2em 0;">
+                    <div id="fire-animation"></div>
+                    <div id="yearly-total-drinks" style="font-weight: bold; font-size: 3em; position: relative;">
+                        Loading...
+                    </div>
+                </div>
+
                 <h2>Total Drinks Per Year</h2>
                 <canvas id="drinksPerYearChart" style="max-width: 800px; margin: 0 auto;"></canvas>
-
 
                 <!-- Bar Chart: Total Drinks Per Day -->
                 <h2>Total Drinks Per Day (Everyone)</h2>
@@ -128,12 +172,27 @@
         // Update "Total Drinks Per Day (Everyone)" chart
         function updateTotalDrinksChart() {
             const totalDrinksData = {};
+            let totalDrinksThisYear = 0;
+
+            const currentYear = new Date().getFullYear(); // Get the current year
 
             // Accumulate total drinks for each day
             data.forEach(record => {
                 if (!totalDrinksData[record.date]) totalDrinksData[record.date] = 0;
-                totalDrinksData[record.date] += Object.values(record.drinks).reduce((sum, value) => sum + value, 0);
+
+                const recordYear = new Date(record.date).getFullYear(); // Extract year from record date
+                const drinksTotal = Object.values(record.drinks).reduce((sum, value) => sum + value, 0);
+
+                totalDrinksData[record.date] += drinksTotal;
+
+                // Add to yearly total if the record is in the current year
+                if (recordYear === currentYear) {
+                    totalDrinksThisYear += drinksTotal;
+                }
             });
+
+            // Update the yearly total in the HTML
+            document.getElementById('yearly-total-drinks').textContent = `${totalDrinksThisYear}`;
 
             const ctxTotalDrinks = document.getElementById('totalDrinksChart').getContext('2d');
 
